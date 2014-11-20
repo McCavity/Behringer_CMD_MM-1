@@ -207,9 +207,9 @@ procedure openController;
     if (DEBUG = true) then
       begin
         systemlog(ME + '.openController called.');
+        MidiOutListDevices;                             // List available MIDI Devices
       end;
 
-    MidiOutListDevices;                                  // List available MIDI Devices
     MidiOutOpen(mAirlistDevice);                        // Open MIDI Device
 
     if (DEBUG = true) then
