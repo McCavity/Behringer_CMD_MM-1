@@ -38,7 +38,7 @@ const
   ME                        = 'Behringer_CMD_MM-1';               // The name of this script (to be used in log entries, e.g.)
 
 /// Configurable settings - adapt to your environment /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  DEBUG                     = true;                              // set this to 'false' in production environment - will print *every* MIDI message to system log!
+  DEBUG                     = false;                              // set this to 'false' in production environment - will print *every* MIDI message to system log!
   mAirlistDevice            = 2;                                  // edit your controller´s device number according to mAirlist log  
   MIDICHANNL                = 4;                                  // beware of MIDI Channel numbering 0..15 (used here) vs. 1..16 (may be used in documentation)
 
