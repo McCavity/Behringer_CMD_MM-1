@@ -277,12 +277,139 @@ procedure OnMidiMessage(Device: integer; Status, Data1, Data2: byte);
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnMidiMessage called.');
+        systemlog(ME + '.OnMidiMessage called: Device: ' + Device + ', Status: ' + Status + ', Data1: ' + Data1 + ', Data2: ' + Data2);
       end;
 
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnMidiMessage finished.');
+      end;
+  end;
+
+// Called when automation is enabled
+procedure OnAutomationOn(PlaylistIndex: integer);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnAutomationOn called. PlaylistIndex: ' + PlaylistIndex);
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnAutomationOn finished.');
+      end;
+  end;
+
+// Called when automation is disabled
+procedure OnAutomationOff(PlaylistIndex: integer);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnAutomationOff called. PlaylistIndex: ' + PlaylistIndex);
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnAutomationOff finished.');
+      end;
+  end;
+
+// Called when (playlist) player is started
+procedure OnPlayerStart(PlaylistIndex: integer; PlayerIndex: integer; Item: IPlaylistItem);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStart called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex + ', TODO: get toStr function for Item (IPlaylistItem)');
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStart finished.');
+      end;
+  end;
+
+// Called when (playlist) player is stopped
+procedure OnPlayerStop(PlaylistIndex: integer; PlayerIndex: integer; Duration: TTimeValue; Item: IPlaylistItem);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStop called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex + ', TODO: get toStr function for Duration (TTimeValue) & Item (IPlaylistItem)');
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStop finished.');
+      end;
+  end;
+
+// Called when (playlist) player reaches EOF warning point (default: 10s before end)
+procedure OnPlayerEOFWarning(PlaylistIndex: integer; PlayerIndex: integer);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerEOFWarning called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex);
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerEOFWarning finished.');
+      end;
+  end;
+
+// Called when (playlist) player changes its state
+procedure OnPlayerStateChange(PlaylistIndex: integer; PlayerIndex: integer; OldState: TPlayerState; NewState: TPlayerState);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStateChange called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex + ', TODO: get toStr functions for OldState, NewState (TPlayerState)');
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStateChange finished.');
+      end;
+  end;
+
+// Called when (playlist) player enters PFL
+procedure OnPlayerPFLOn(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: integer);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerPFLOn called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex + ', PFLCount: ' + PFLCount);
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerPFLOn finished.');
+      end;
+  end;
+
+// Called when (playlist) player leaves PFL
+procedure OnPlayerPFLOff(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: integer);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerPFLOff called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex + ', PFLCount: ' + PFLCount);
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerPFLOff finished.');
+      end;
+  end;
+
+// Called when RuntimeData (global variables shared among scripts) change.
+// Set data with SetRuntimData(key, value);
+procedure OnRuntimeDataChange(Key, Value: string);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnRuntimeDataChange called. Key: ' + Key + ", Value: ' + Value);
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnRuntimeDataChange finished.');
       end;
   end;
 
