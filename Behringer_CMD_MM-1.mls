@@ -38,7 +38,7 @@ const
   ME                        = 'Behringer_CMD_MM-1';               // The name of this script (to be used in log entries, e.g.)
 
 /// Configurable settings - adapt to your environment /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  DEBUG                     = false;                              // set this to 'false' in production environment - will print *every* MIDI message to system log!
+  DEBUG                     = true;                              // set this to 'false' in production environment - will print *every* MIDI message to system log!
   mAirlistDevice            = 2;                                  // edit your controller´s device number according to mAirlist log  
   MIDICHANNL                = 4;                                  // beware of MIDI Channel numbering 0..15 (used here) vs. 1..16 (may be used in documentation)
 
@@ -219,7 +219,6 @@ procedure openController;
   end;
 
 procedure closeController;
-
   begin
     if (DEBUG = true) then
       begin
@@ -234,6 +233,87 @@ procedure closeController;
       end;
   end;
 
+procedure setAssist;
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetAssist called.');
+      end;
+
+    resetController;
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[1], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[1], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[2], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[2], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[1], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[1], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[3], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[3], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[4], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[4], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[2], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[2], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[5], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[5], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[6], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[6], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[3], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[3], cLEDOn);
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetAssist finished.');
+      end;
+  end;
+
+procedure setAutomation;
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetAutomation called.');
+      end;
+
+    resetController;
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[1], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[1], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[2], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[2], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[1], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[1], cLEDOn);
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetAutomation finished.');
+      end;
+  end;
+
+procedure setVoicetrack;
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetVoicetrack called.');
+      end;
+
+    resetController;
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[1], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[1], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[2], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[2], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[1], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[1], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[3], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[3], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[4], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[4], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[2], cLEDOn);
+    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[2], cLEDOn);
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetVoicetrack finished.');
+      end;
+  end;
+
 procedure OnLoad;
   begin
     if (DEBUG = true) then
@@ -242,14 +322,8 @@ procedure OnLoad;
       end;
 
     initController; 
-    if (DEBUG = true) then
-      begin
-        testController;
-      end;
-    if (DEBUG = false) then
-      begin
-        resetController;
-      end;
+    openController;
+    setAssist;
 
     if (DEBUG = true) then
       begin
@@ -294,6 +368,8 @@ procedure OnAutomationOn(PlaylistIndex: integer);
         systemlog(ME + '.OnAutomationOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
       end;
 
+    setAutomation;
+
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnAutomationOn finished.');
@@ -308,6 +384,8 @@ procedure OnAutomationOff(PlaylistIndex: integer);
         systemlog(ME + '.OnAutomationOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
       end;
 
+    setAssist;
+
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnAutomationOff finished.');
@@ -321,7 +399,21 @@ procedure OnPlayerStart(PlaylistIndex: integer; PlayerIndex: integer; Item: IPla
       begin
         systemlog(ME + '.OnPlayerStart called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Item (IPlaylistItem)');
       end;
-
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then
+      begin
+        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[1], cLEDBlink);
+        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[1], cLEDBlink);
+      end;
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then
+      begin
+        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[2], cLEDBlink);
+        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[2], cLEDBlink);
+      end;
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then
+      begin
+        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[3], cLEDBlink);
+        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[3], cLEDBlink);
+      end;
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnPlayerStart finished.');
@@ -335,7 +427,21 @@ procedure OnPlayerStop(PlaylistIndex: integer; PlayerIndex: integer; Duration: T
       begin
         systemlog(ME + '.OnPlayerStop called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Duration (TTimeValue) & Item (IPlaylistItem)');
       end;
-
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then
+      begin
+        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[1], cLEDOn);
+        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[1], cLEDOn);
+      end;
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then
+      begin
+        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[2], cLEDOn);
+        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[2], cLEDOn);
+      end;
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then
+      begin
+        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[3], cLEDOn);
+        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[3], cLEDOn);
+      end;
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnPlayerStop finished.');
