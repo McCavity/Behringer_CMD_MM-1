@@ -38,7 +38,7 @@ const
   ME                        = 'Behringer_CMD_MM-1';               // The name of this script (to be used in log entries, e.g.)
 
 /// Configurable settings - adapt to your environment /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  DEBUG                     = true;                              // set this to 'false' in production environment - will print *every* MIDI message to system log!
+  DEBUG                     = false;                              // set this to 'false' in production environment - will print *every* MIDI message to system log!
   mAirlistDevice            = 2;                                  // edit your controller´s device number according to mAirlist log  
   MIDICHANNL                = 4;                                  // beware of MIDI Channel numbering 0..15 (used here) vs. 1..16 (may be used in documentation)
 
@@ -277,7 +277,7 @@ procedure OnMidiMessage(Device: integer; Status, Data1, Data2: byte);
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnMidiMessage called: Device: ' + Device + ', Status: ' + Status + ', Data1: ' + Data1 + ', Data2: ' + Data2);
+        systemlog(ME + '.OnMidiMessage called: Device: ' + IntToStr(Device) + ', Status: ' + IntToStr(Status) + ', Data1: ' + IntToStr(Data1) + ', Data2: ' +IntToStr(Data2));
       end;
 
     if (DEBUG = true) then
@@ -291,7 +291,7 @@ procedure OnAutomationOn(PlaylistIndex: integer);
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnAutomationOn called. PlaylistIndex: ' + PlaylistIndex);
+        systemlog(ME + '.OnAutomationOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
       end;
 
     if (DEBUG = true) then
@@ -305,7 +305,7 @@ procedure OnAutomationOff(PlaylistIndex: integer);
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnAutomationOff called. PlaylistIndex: ' + PlaylistIndex);
+        systemlog(ME + '.OnAutomationOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
       end;
 
     if (DEBUG = true) then
@@ -319,7 +319,7 @@ procedure OnPlayerStart(PlaylistIndex: integer; PlayerIndex: integer; Item: IPla
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnPlayerStart called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex + ', TODO: get toStr function for Item (IPlaylistItem)');
+        systemlog(ME + '.OnPlayerStart called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Item (IPlaylistItem)');
       end;
 
     if (DEBUG = true) then
@@ -333,7 +333,7 @@ procedure OnPlayerStop(PlaylistIndex: integer; PlayerIndex: integer; Duration: T
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnPlayerStop called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex + ', TODO: get toStr function for Duration (TTimeValue) & Item (IPlaylistItem)');
+        systemlog(ME + '.OnPlayerStop called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Duration (TTimeValue) & Item (IPlaylistItem)');
       end;
 
     if (DEBUG = true) then
@@ -347,7 +347,7 @@ procedure OnPlayerEOFWarning(PlaylistIndex: integer; PlayerIndex: integer);
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnPlayerEOFWarning called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex);
+        systemlog(ME + '.OnPlayerEOFWarning called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex));
       end;
 
     if (DEBUG = true) then
@@ -361,7 +361,7 @@ procedure OnPlayerStateChange(PlaylistIndex: integer; PlayerIndex: integer; OldS
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnPlayerStateChange called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex + ', TODO: get toStr functions for OldState, NewState (TPlayerState)');
+        systemlog(ME + '.OnPlayerStateChange called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr functions for OldState, NewState (TPlayerState)');
       end;
 
     if (DEBUG = true) then
@@ -375,7 +375,7 @@ procedure OnPlayerPFLOn(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: 
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnPlayerPFLOn called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex + ', PFLCount: ' + PFLCount);
+        systemlog(ME + '.OnPlayerPFLOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
       end;
 
     if (DEBUG = true) then
@@ -389,7 +389,7 @@ procedure OnPlayerPFLOff(PlaylistIndex: integer; PlayerIndex: integer; PFLCount:
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnPlayerPFLOff called. PlaylistIndex: ' + PlaylistIndex + ', PlayerIndex: ' + PlayerIndex + ', PFLCount: ' + PFLCount);
+        systemlog(ME + '.OnPlayerPFLOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
       end;
 
     if (DEBUG = true) then
@@ -404,7 +404,7 @@ procedure OnRuntimeDataChange(Key, Value: string);
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnRuntimeDataChange called. Key: ' + Key + ", Value: ' + Value);
+        systemlog(ME + '.OnRuntimeDataChange called. Key: ' + Key + ', Value: ' + Value);
       end;
 
     if (DEBUG = true) then
