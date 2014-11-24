@@ -73,6 +73,25 @@ var
   VoiceTrack:               boolean;                              // This is 'true' while Voice Track recorder or editor are open, 'false' otherwise
                                                                   // TODO: check if this can be queried from mAirlist (as well as 'Assist' and 'Auto' states)
 
+function StateToStr(iState: TPlayerState): String;
+  begin
+    Case iState Of
+      psEmpty:    Result := 'psEmpty';
+      psLoading:  Result := 'psLoading';
+      psLoaded:   Result := 'psLoaded';
+      psPlaying:  Result := 'psPlaying';
+      psFading:   Result := 'psFading';
+      psEOF:      Result := 'psEOF';
+      psError:    Result := 'psError';
+      psPaused:   Result := 'psPaused';
+      psStopped:  Result := 'psStopped';
+      psPFL:      Result := 'psPFL';
+      psFlashEOF: Result := 'psFlashEOF';
+      psNext:     Result := 'psNext';
+    else          Result := 'unknown';
+    end;
+  end;
+
 procedure initController;
   var
     i:                        integer;
@@ -331,7 +350,7 @@ procedure OnLoad;
       end;
   end;
 
-procedure OnShutdown;
+procedure OnUnload;
   begin
     if (DEBUG = true) then
       begin
@@ -467,7 +486,7 @@ procedure OnPlayerStateChange(PlaylistIndex: integer; PlayerIndex: integer; OldS
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnPlayerStateChange called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr functions for OldState, NewState (TPlayerState)');
+        systemlog(ME + '.OnPlayerStateChange called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', OldState: ' + StateToStr(OldState) + ', NewState:' + StateToStr(NewState));
       end;
 
     if (DEBUG = true) then
