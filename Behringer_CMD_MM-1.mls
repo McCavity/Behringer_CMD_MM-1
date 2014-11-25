@@ -334,26 +334,6 @@ procedure setAssist;
         systemlog(ME + '.SetAssist called.');
       end;
 
-    resetController;
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[1], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[1], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[2], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[2], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[1], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[1], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[3], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[3], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[4], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[4], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[2], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[2], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[5], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[5], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[6], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[6], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[3], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[3], cLEDOn);
-
     if (DEBUG = true) then
       begin
         systemlog(ME + '.SetAssist finished.');
@@ -367,14 +347,6 @@ procedure setAutomation;
         systemlog(ME + '.SetAutomation called.');
       end;
 
-    resetController;
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[1], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[1], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[2], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[2], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[1], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[1], cLEDOn);
-
     if (DEBUG = true) then
       begin
         systemlog(ME + '.SetAutomation finished.');
@@ -387,20 +359,6 @@ procedure setVoicetrack;
       begin
         systemlog(ME + '.SetVoicetrack called.');
       end;
-
-    resetController;
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[1], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[1], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[2], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[2], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[1], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[1], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[3], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[3], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, SideButtons[4], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, SideButtons[4], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTONON, CueButtons[2], cLEDOn);
-    midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[2], cLEDOn);
 
     if (DEBUG = true) then
       begin
@@ -417,7 +375,6 @@ procedure OnLoad;
 
     initController; 
     openController;
-    setAssist;
 
     if (DEBUG = true) then
       begin
@@ -478,8 +435,6 @@ procedure OnAutomationOff(PlaylistIndex: integer);
         systemlog(ME + '.OnAutomationOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
       end;
 
-    setAssist;
-
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnAutomationOff finished.');
@@ -493,21 +448,9 @@ procedure OnPlayerStart(PlaylistIndex: integer; PlayerIndex: integer; Item: IPla
       begin
         systemlog(ME + '.OnPlayerStart called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Item (IPlaylistItem)');
       end;
-    if (PlaylistIndex = 0) and (PlayerIndex = 0) then
-      begin
-        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[1], cLEDBlink);
-        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[1], cLEDBlink);
-      end;
-    if (PlaylistIndex = 0) and (PlayerIndex = 1) then
-      begin
-        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[2], cLEDBlink);
-        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[2], cLEDBlink);
-      end;
-    if (PlaylistIndex = 1) and (PlayerIndex = 0) then
-      begin
-        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[3], cLEDBlink);
-        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[3], cLEDBlink);
-      end;
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDBlink);
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDBlink);
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDBlink);
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnPlayerStart finished.');
@@ -521,21 +464,9 @@ procedure OnPlayerStop(PlaylistIndex: integer; PlayerIndex: integer; Duration: T
       begin
         systemlog(ME + '.OnPlayerStop called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Duration (TTimeValue) & Item (IPlaylistItem)');
       end;
-    if (PlaylistIndex = 0) and (PlayerIndex = 0) then
-      begin
-        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[1], cLEDOn);
-        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[1], cLEDOn);
-      end;
-    if (PlaylistIndex = 0) and (PlayerIndex = 1) then
-      begin
-        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[2], cLEDOn);
-        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[2], cLEDOn);
-      end;
-    if (PlaylistIndex = 1) and (PlayerIndex = 0) then
-      begin
-        midiout(mAirlistDevice, MM1BUTTONON, CueButtons[3], cLEDOn);
-        midiout(mAirlistDevice, MM1BUTTNOFF, CueButtons[3], cLEDOn);
-      end;
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDOn);
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDOn);
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDOn);
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnPlayerStop finished.');
@@ -549,7 +480,9 @@ procedure OnPlayerEOFWarning(PlaylistIndex: integer; PlayerIndex: integer);
       begin
         systemlog(ME + '.OnPlayerEOFWarning called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex));
       end;
-
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 2, cLEDBlink);
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 4, cLEDBlink);
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 6, cLEDBlink);
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnPlayerEOFWarning finished.');
@@ -563,7 +496,62 @@ procedure OnPlayerStateChange(PlaylistIndex: integer; PlayerIndex: integer; OldS
       begin
         systemlog(ME + '.OnPlayerStateChange called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', OldState: ' + StateToStr(OldState) + ', NewState:' + StateToStr(NewState));
       end;
-
+    case NewState of
+      psLoaded:
+        begin
+          if (PlaylistIndex = 0) and (PlayerIndex = 0) then
+	    begin
+	      setComponent('cueButton', 1, cLEDOn);
+	      setComponent('sideButton', 1, cLEDOn);
+	      setComponent('sideButton', 2, cLEDOn);
+            end;
+          if (PlaylistIndex = 0) and (PlayerIndex = 1) then
+            begin
+              setComponent('cueButton', 2, cLEDOn);
+              setComponent('sideButton', 3, cLEDOn);
+              setComponent('sideButton', 4, cLEDOn);
+            end;
+        if (PlaylistIndex = 1) and (PlayerIndex = 0) then
+            begin
+              setComponent('cueButton', 3, cLEDOn);
+              setComponent('sideButton', 5, cLEDOn);
+              setComponent('sideButton', 6, cLEDOn);
+            end;
+        end;
+      psEmpty:
+        begin
+          if (PlaylistIndex = 0) and (PlayerIndex = 0) then
+	    begin
+	      setComponent('cueButton', 1, cLEDOff);
+	      setComponent('sideButton', 1, cLEDOff);
+	      setComponent('sideButton', 2, cLEDOff);
+            end;
+          if (PlaylistIndex = 0) and (PlayerIndex = 1) then
+            begin
+              setComponent('cueButton', 2, cLEDOff);
+              setComponent('sideButton', 3, cLEDOff);
+              setComponent('sideButton', 4, cLEDOff);
+            end;
+        if (PlaylistIndex = 1) and (PlayerIndex = 0) then
+            begin
+              setComponent('cueButton', 3, cLEDOff);
+              setComponent('sideButton', 5, cLEDOff);
+              setComponent('sideButton', 6, cLEDOff);
+            end;
+        end;
+      psPlaying:
+        begin
+          if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDBlink);
+          if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDBlink);
+          if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDBlink);
+        end;
+      psPaused:
+        begin
+          if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDOn);
+          if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDOn);
+          if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDOn);
+        end;
+    end;
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnPlayerStateChange finished.');
@@ -577,7 +565,9 @@ procedure OnPlayerPFLOn(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: 
       begin
         systemlog(ME + '.OnPlayerPFLOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
       end;
-
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 1, cLEDBlink);
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 3, cLEDBlink);
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 5, cLEDBlink);
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnPlayerPFLOn finished.');
@@ -591,7 +581,9 @@ procedure OnPlayerPFLOff(PlaylistIndex: integer; PlayerIndex: integer; PFLCount:
       begin
         systemlog(ME + '.OnPlayerPFLOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
       end;
-
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 1, cLEDOn);
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 3, cLEDOn);
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 5, cLEDOn);
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnPlayerPFLOff finished.');
