@@ -367,6 +367,9 @@ procedure setVoicetrack;
   end;
 
 procedure OnLoad;
+  var
+    i: integer;
+
   begin
     if (DEBUG = true) then
       begin
@@ -375,6 +378,17 @@ procedure OnLoad;
 
     initController; 
     openController;
+
+    for i := 0 to Engine.GetPlayBackControl(0).GetPlayerCount - 1 do
+      begin
+        if (Engine.GetPlaybackControl(0).GetPlayer(i).GetState = psLoaded) then
+          begin
+            setComponent('cueButton', i + 1, cLEDOn);
+            setComponent('sideButton', (2 * i) + 1, cLEDOn);
+            setComponent('sideButton', (2 * i) + 2, cLEDOn);
+          end;
+      end;
+
 
     if (DEBUG = true) then
       begin
