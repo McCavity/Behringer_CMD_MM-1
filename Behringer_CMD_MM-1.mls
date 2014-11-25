@@ -92,6 +92,73 @@ function StateToStr(iState: TPlayerState): String;
     end;
   end;
 
+procedure SetComponent(componentName: String; componentIndex, newState: integer);
+  var
+    componentAddress:       integer;
+    componentType:          string;
+
+  begin
+      case componentName of
+        'vuMeter':
+          begin
+            componentType := 'controller';
+            case componentIndex of
+              1: componentAddress := VUMeters[1];
+              2: componentAddress := VUMeters[2];
+            else componentType := 'unknown';
+            end;
+          end;
+        'cueButton':
+          begin
+            componentType := 'button';
+            case componentIndex of
+              1: componentAddress := CueButtons[1];
+              2: componentAddress := CueButtons[2];
+              3: componentAddress := CueButtons[3];
+              4: componentAddress := CueButtons[4];
+            else componentType := 'unknown';
+            end;
+	  end;
+        'sideButton':
+          begin
+            componentType := 'button';
+            case componentIndex of
+              1: componentAddress := SideButtons[1];
+              2: componentAddress := SideButtons[2];
+              3: componentAddress := SideButtons[3];
+              4: componentAddress := SideButtons[4];
+              5: componentAddress := SideButtons[5];
+              6: componentAddress := SideButtons[6];
+              7: componentAddress := SideButtons[7];
+              8: componentAddress := SideButtons[8];
+            else componentType := 'unknown';
+            end;
+          end;
+        'middleButton':
+          begin
+            componentType := 'button';
+            case componentIndex of
+              1: componentAddress := MiddleButton;
+            else componentType := 'unknown';
+            end;
+          end;
+        else componentType := 'unknown';
+    end;
+    case componentType of
+      'controller':
+        begin
+          midiout(mAirlistDevice, MM1CONTROLR, componentAddress, newState);
+        end;
+      'button':
+        begin
+          midiout(mAirlistDevice, MM1BUTTONON, componentAddress, newState);
+          midiout(mAirlistDevice, MM1BUTTNOFF, componentAddress, newState);
+        end;
+      'unknown': systemlog(ME + '.SetComponent: ERROR: unexpected input value: unknown component type or component index out of bounds (called with componentName: ' + componentName + ', componentIndex: ' + IntToStr(componentIndex) + ', newState: ' + IntToStr(newState) + ')');
+      else systemlog(ME + '.SetComponent: ERROR: unexpected behaviour (called with componentName: ' + componentName + ', componentIndex: ' + IntToStr(componentIndex) + ', newState: ' + IntToStr(newState) + ')');
+    end;
+  end;
+
 procedure initController;
   var
     i:                        integer;
@@ -177,14 +244,18 @@ procedure testController;
     // set the VU meters (basic communication check, if they don´t light then something´s wrong...
     for i:=1 to 2 do
       begin
-        midiout(mAirlistDevice, MM1CONTROLR, VUMeters[i], 58);
+        SetComponent('vuMeter', i, 58)
       end;
     // set the buttons to 'blinking'
-    for i:=1 to 13 do
+    for i:=1 to 4 do
       begin
-        midiout(mAirlistDevice, MM1BUTTONON, AllButtons[i], cLEDBlink);
-        midiout(mAirlistDevice, MM1BUTTNOFF, AllButtons[i], cLEDBlink);
+        SetComponent('cueButton', i, cLEDBlink)
       end;
+    for i:=1 to 8 do
+      begin
+        SetComponent('sideButton', i, cLEDBlink)
+      end;
+    SetComponent('middleButton', 1, cLEDBlink)
 
     if (DEBUG = true) then
       begin
@@ -205,14 +276,18 @@ procedure resetController;
     // reset the VU meters
     for i:=1 to 2 do
       begin
-        midiout(mAirlistDevice, MM1CONTROLR, VUMeters[i], 48);
+        SetComponent('vuMeter', i, 48)
       end;
     // reset the buttons
-    for i:=1 to 13 do
+    for i:=1 to 4 do
       begin
-        midiout(mAirlistDevice, MM1BUTTONON, AllButtons[i], cLEDOff);
-        midiout(mAirlistDevice, MM1BUTTNOFF, AllButtons[i], cLEDOff);
+        SetComponent('cueButton', i, cLEDOff)
       end;
+    for i:=1 to 8 do
+      begin
+        SetComponent('sideButton', i, cLEDOff)
+      end;
+    SetComponent('middleButton', 1, cLEDOff)
 
     if (DEBUG = true) then
       begin
