@@ -12,16 +12,16 @@
 //        1. Place this script in your mAirlist script folder (e.g.
 //           C:\Program Files\mAirlist\scripts)
 //        2. Edit this script and set DEBUG to 'true'
-//        3. Run this script once from mAirlist. Open mAirlist´s System Log
+//        3. Run this script once from mAirlist. Open mAirlistÂ´s System Log
 //           and note the device number of your Controller.
 //        4. Edit this script again and set mAirlistDevice to the number you
 //           just noted.
 //        5. Run this script once again from mAirlist. All buttons should start
 //           blinking blue & the VU meters should light up approximately 2/3.
-//           If this doesn´t happen, maybe your devices uses a different MIDI
+//           If this doesnÂ´t happen, maybe your devices uses a different MIDI
 //           channel. You can either cycle through the edit / run sequence 
 //           each time modifying the MIDI channel number until you find the
-//           correct setting or use Behringer´s App (download from Behringer´s
+//           correct setting or use BehringerÂ´s App (download from BehringerÂ´s
 //           product page) to determine / set the correct MIDI channel. In any
 //           case, edit this script to reflect the correct MIDI channel number
 //        6. Edit this script to set DEBUG to 'false'
@@ -30,7 +30,8 @@
 //        8. Set up this scrip as a Notification Script in mAirlist.
 // 
 // Version 0.1 - 15.11.2014 - Initial draft, connection to MIDI device, test and reset routines
-//         0.2 - 19.11.2014
+//         0.2 - 19.11.2014 - added the skeleton from NotificationScriptTemplate
+//         1.0 - 25.11.2014 - Completed initial functionality
 // 
 
 const
@@ -39,7 +40,7 @@ const
 
 /// Configurable settings - adapt to your environment /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   DEBUG                     = true;                              // set this to 'false' in production environment - will print *every* MIDI message to system log!
-  mAirlistDevice            = 2;                                  // edit your controller´s device number according to mAirlist log  
+  mAirlistDevice            = 2;                                  // edit your controllerÂ´s device number according to mAirlist log  
   MIDICHANNL                = 4;                                  // beware of MIDI Channel numbering 0..15 (used here) vs. 1..16 (may be used in documentation)
 
 /// MIDI protocol settings - these should never change ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,11 +48,11 @@ const
   MIDINOTEON                = 144;                                // 0x9n indicates 'button pressed'
   MIDICTRLCH                = 176;                                // 0xBn used by encoders and the 'VU Meters'
   
-/// BEGIN Behringer CMD MM-1 settings - DON´T touch unless you know what you are doing!!! /////////////////////////////////////////////////////////////////////////////////////////
+/// BEGIN Behringer CMD MM-1 settings - DONÂ´T touch unless you know what you are doing!!! /////////////////////////////////////////////////////////////////////////////////////////
   MM1BUTTNOFF               = MIDINOTOFF + MIDICHANNL;            // Will be received on button release and sent after a button LED change
   MM1BUTTONON               = MIDINOTEON + MIDICHANNL;            // Will be received on button press and sent to initiate button LED change
   MM1CONTROLR               = MIDICTRLCH + MIDICHANNL;            // Will be received whenever a controller chnages state. Can be sent to set VU
-  cLEDOff                   = 0;                                  // Turn the LEDs amber (can´t turn them off entirely)
+  cLEDOff                   = 0;                                  // Turn the LEDs amber (canÂ´t turn them off entirely)
   cLEDOn                    = 1;                                  // Turn the LEDs blue
   cLEDBlink                 = 2;                                  // Let the LEDs blink blue
 
@@ -72,6 +73,92 @@ var
 /// Internal script variables (global) ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   VoiceTrack:               boolean;                              // This is 'true' while Voice Track recorder or editor are open, 'false' otherwise
                                                                   // TODO: check if this can be queried from mAirlist (as well as 'Assist' and 'Auto' states)
+
+function StateToStr(iState: TPlayerState): String;
+  begin
+    Case iState Of
+      psEmpty:    Result := 'psEmpty';
+      psLoading:  Result := 'psLoading';
+      psLoaded:   Result := 'psLoaded';
+      psPlaying:  Result := 'psPlaying';
+      psFading:   Result := 'psFading';
+      psEOF:      Result := 'psEOF';
+      psError:    Result := 'psError';
+      psPaused:   Result := 'psPaused';
+      psStopped:  Result := 'psStopped';
+      psPFL:      Result := 'psPFL';
+      psFlashEOF: Result := 'psFlashEOF';
+      psNext:     Result := 'psNext';
+    else          Result := 'unknown';
+    end;
+  end;
+
+procedure SetComponent(componentName: String; componentIndex, newState: integer);
+  var
+    componentAddress:       integer;
+    componentType:          string;
+
+  begin
+      case componentName of
+        'vuMeter':
+          begin
+            componentType := 'controller';
+            case componentIndex of
+              1: componentAddress := VUMeters[1];
+              2: componentAddress := VUMeters[2];
+            else componentType := 'unknown';
+            end;
+          end;
+        'cueButton':
+          begin
+            componentType := 'button';
+            case componentIndex of
+              1: componentAddress := CueButtons[1];
+              2: componentAddress := CueButtons[2];
+              3: componentAddress := CueButtons[3];
+              4: componentAddress := CueButtons[4];
+            else componentType := 'unknown';
+            end;
+	  end;
+        'sideButton':
+          begin
+            componentType := 'button';
+            case componentIndex of
+              1: componentAddress := SideButtons[1];
+              2: componentAddress := SideButtons[2];
+              3: componentAddress := SideButtons[3];
+              4: componentAddress := SideButtons[4];
+              5: componentAddress := SideButtons[5];
+              6: componentAddress := SideButtons[6];
+              7: componentAddress := SideButtons[7];
+              8: componentAddress := SideButtons[8];
+            else componentType := 'unknown';
+            end;
+          end;
+        'middleButton':
+          begin
+            componentType := 'button';
+            case componentIndex of
+              1: componentAddress := MiddleButton;
+            else componentType := 'unknown';
+            end;
+          end;
+        else componentType := 'unknown';
+    end;
+    case componentType of
+      'controller':
+        begin
+          midiout(mAirlistDevice, MM1CONTROLR, componentAddress, newState);
+        end;
+      'button':
+        begin
+          midiout(mAirlistDevice, MM1BUTTONON, componentAddress, newState);
+          midiout(mAirlistDevice, MM1BUTTNOFF, componentAddress, newState);
+        end;
+      'unknown': systemlog(ME + '.SetComponent: ERROR: unexpected input value: unknown component type or component index out of bounds (called with componentName: ' + componentName + ', componentIndex: ' + IntToStr(componentIndex) + ', newState: ' + IntToStr(newState) + ')');
+      else systemlog(ME + '.SetComponent: ERROR: unexpected behaviour (called with componentName: ' + componentName + ', componentIndex: ' + IntToStr(componentIndex) + ', newState: ' + IntToStr(newState) + ')');
+    end;
+  end;
 
 procedure initController;
   var
@@ -155,17 +242,21 @@ procedure testController;
         systemlog(ME + '.testController called.');
       end;
 
-    // set the VU meters (basic communication check, if they don´t light then something´s wrong...
+    // set the VU meters (basic communication check, if they donÂ´t light then somethingÂ´s wrong...
     for i:=1 to 2 do
       begin
-        midiout(mAirlistDevice, MM1CONTROLR, VUMeters[i], 58);
+        SetComponent('vuMeter', i, 58)
       end;
     // set the buttons to 'blinking'
-    for i:=1 to 13 do
+    for i:=1 to 4 do
       begin
-        midiout(mAirlistDevice, MM1BUTTONON, AllButtons[i], cLEDBlink);
-        midiout(mAirlistDevice, MM1BUTTNOFF, AllButtons[i], cLEDBlink);
+        SetComponent('cueButton', i, cLEDBlink)
       end;
+    for i:=1 to 8 do
+      begin
+        SetComponent('sideButton', i, cLEDBlink)
+      end;
+    SetComponent('middleButton', 1, cLEDBlink)
 
     if (DEBUG = true) then
       begin
@@ -186,14 +277,18 @@ procedure resetController;
     // reset the VU meters
     for i:=1 to 2 do
       begin
-        midiout(mAirlistDevice, MM1CONTROLR, VUMeters[i], 48);
+        SetComponent('vuMeter', i, 48)
       end;
     // reset the buttons
-    for i:=1 to 13 do
+    for i:=1 to 4 do
       begin
-        midiout(mAirlistDevice, MM1BUTTONON, AllButtons[i], cLEDOff);
-        midiout(mAirlistDevice, MM1BUTTNOFF, AllButtons[i], cLEDOff);
+        SetComponent('cueButton', i, cLEDOff)
       end;
+    for i:=1 to 8 do
+      begin
+        SetComponent('sideButton', i, cLEDOff)
+      end;
+    SetComponent('middleButton', 1, cLEDOff)
 
     if (DEBUG = true) then
       begin
@@ -219,7 +314,6 @@ procedure openController;
   end;
 
 procedure closeController;
-
   begin
     if (DEBUG = true) then
       begin
@@ -234,7 +328,49 @@ procedure closeController;
       end;
   end;
 
+procedure setAssist;
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetAssist called.');
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetAssist finished.');
+      end;
+  end;
+
+procedure setAutomation;
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetAutomation called.');
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetAutomation finished.');
+      end;
+  end;
+
+procedure setVoicetrack;
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetVoicetrack called.');
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.SetVoicetrack finished.');
+      end;
+  end;
+
 procedure OnLoad;
+  var
+    i: integer;
+
   begin
     if (DEBUG = true) then
       begin
@@ -242,14 +378,18 @@ procedure OnLoad;
       end;
 
     initController; 
-    if (DEBUG = true) then
+    openController;
+
+    for i := 0 to Engine.GetPlayBackControl(0).GetPlayerCount - 1 do
       begin
-        testController;
+        if (Engine.GetPlaybackControl(0).GetPlayer(i).GetState = psLoaded) then
+          begin
+            setComponent('cueButton', i + 1, cLEDOn);
+            setComponent('sideButton', (2 * i) + 1, cLEDOn);
+            setComponent('sideButton', (2 * i) + 2, cLEDOn);
+          end;
       end;
-    if (DEBUG = false) then
-      begin
-        resetController;
-      end;
+
 
     if (DEBUG = true) then
       begin
@@ -257,7 +397,7 @@ procedure OnLoad;
       end;
   end;
 
-procedure OnShutdown;
+procedure OnUnload;
   begin
     if (DEBUG = true) then
       begin
@@ -277,12 +417,206 @@ procedure OnMidiMessage(Device: integer; Status, Data1, Data2: byte);
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.OnMidiMessage called.');
+        systemlog(ME + '.OnMidiMessage called: Device: ' + IntToStr(Device) + ', Status: ' + IntToStr(Status) + ', Data1: ' + IntToStr(Data1) + ', Data2: ' +IntToStr(Data2));
       end;
 
     if (DEBUG = true) then
       begin
         systemlog(ME + '.OnMidiMessage finished.');
+      end;
+  end;
+
+// Called when automation is enabled
+procedure OnAutomationOn(PlaylistIndex: integer);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnAutomationOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
+      end;
+
+    setAutomation;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnAutomationOn finished.');
+      end;
+  end;
+
+// Called when automation is disabled
+procedure OnAutomationOff(PlaylistIndex: integer);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnAutomationOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnAutomationOff finished.');
+      end;
+  end;
+
+// Called when (playlist) player is started
+procedure OnPlayerStart(PlaylistIndex: integer; PlayerIndex: integer; Item: IPlaylistItem);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStart called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Item (IPlaylistItem)');
+      end;
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDBlink);
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDBlink);
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDBlink);
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStart finished.');
+      end;
+  end;
+
+// Called when (playlist) player is stopped
+procedure OnPlayerStop(PlaylistIndex: integer; PlayerIndex: integer; Duration: TTimeValue; Item: IPlaylistItem);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStop called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Duration (TTimeValue) & Item (IPlaylistItem)');
+      end;
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDOn);
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDOn);
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDOn);
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStop finished.');
+      end;
+  end;
+
+// Called when (playlist) player reaches EOF warning point (default: 10s before end)
+procedure OnPlayerEOFWarning(PlaylistIndex: integer; PlayerIndex: integer);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerEOFWarning called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex));
+      end;
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 2, cLEDBlink);
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 4, cLEDBlink);
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 6, cLEDBlink);
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerEOFWarning finished.');
+      end;
+  end;
+
+// Called when (playlist) player changes its state
+procedure OnPlayerStateChange(PlaylistIndex: integer; PlayerIndex: integer; OldState: TPlayerState; NewState: TPlayerState);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStateChange called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', OldState: ' + StateToStr(OldState) + ', NewState:' + StateToStr(NewState));
+      end;
+    case NewState of
+      psLoaded:
+        begin
+          if (PlaylistIndex = 0) and (PlayerIndex = 0) then
+	    begin
+	      setComponent('cueButton', 1, cLEDOn);
+	      setComponent('sideButton', 1, cLEDOn);
+	      setComponent('sideButton', 2, cLEDOn);
+            end;
+          if (PlaylistIndex = 0) and (PlayerIndex = 1) then
+            begin
+              setComponent('cueButton', 2, cLEDOn);
+              setComponent('sideButton', 3, cLEDOn);
+              setComponent('sideButton', 4, cLEDOn);
+            end;
+        if (PlaylistIndex = 1) and (PlayerIndex = 0) then
+            begin
+              setComponent('cueButton', 3, cLEDOn);
+              setComponent('sideButton', 5, cLEDOn);
+              setComponent('sideButton', 6, cLEDOn);
+            end;
+        end;
+      psEmpty:
+        begin
+          if (PlaylistIndex = 0) and (PlayerIndex = 0) then
+	    begin
+	      setComponent('cueButton', 1, cLEDOff);
+	      setComponent('sideButton', 1, cLEDOff);
+	      setComponent('sideButton', 2, cLEDOff);
+            end;
+          if (PlaylistIndex = 0) and (PlayerIndex = 1) then
+            begin
+              setComponent('cueButton', 2, cLEDOff);
+              setComponent('sideButton', 3, cLEDOff);
+              setComponent('sideButton', 4, cLEDOff);
+            end;
+        if (PlaylistIndex = 1) and (PlayerIndex = 0) then
+            begin
+              setComponent('cueButton', 3, cLEDOff);
+              setComponent('sideButton', 5, cLEDOff);
+              setComponent('sideButton', 6, cLEDOff);
+            end;
+        end;
+      psPlaying:
+        begin
+          if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDBlink);
+          if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDBlink);
+          if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDBlink);
+        end;
+      psPaused:
+        begin
+          if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDOn);
+          if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDOn);
+          if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDOn);
+        end;
+    end;
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerStateChange finished.');
+      end;
+  end;
+
+// Called when (playlist) player enters PFL
+procedure OnPlayerPFLOn(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: integer);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerPFLOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
+      end;
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 1, cLEDBlink);
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 3, cLEDBlink);
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 5, cLEDBlink);
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerPFLOn finished.');
+      end;
+  end;
+
+// Called when (playlist) player leaves PFL
+procedure OnPlayerPFLOff(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: integer);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerPFLOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
+      end;
+    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 1, cLEDOn);
+    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 3, cLEDOn);
+    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 5, cLEDOn);
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnPlayerPFLOff finished.');
+      end;
+  end;
+
+// Called when RuntimeData (global variables shared among scripts) change.
+// Set data with SetRuntimData(key, value);
+procedure OnRuntimeDataChange(Key, Value: string);
+  begin
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnRuntimeDataChange called. Key: ' + Key + ', Value: ' + Value);
+      end;
+
+    if (DEBUG = true) then
+      begin
+        systemlog(ME + '.OnRuntimeDataChange finished.');
       end;
   end;
 
