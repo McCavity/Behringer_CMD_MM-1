@@ -412,7 +412,7 @@ procedure OnUnload;
   begin
     if (DEBUG = true) then
       begin
-        systemlog(ME + ‚.OnUnload called.');
+        systemlog(ME + '.OnUnload called.');
       end;
  
     resetController;
@@ -420,7 +420,7 @@ procedure OnUnload;
  
     if (DEBUG = true) then
       begin
-        systemlog(ME + ‚.OnUnload finished.');
+        systemlog(ME + '.OnUnload finished.');
       end;
   end;
 
