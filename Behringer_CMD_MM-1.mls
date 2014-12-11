@@ -448,7 +448,7 @@ procedure OnPlayerStop(PlaylistIndex: integer; PlayerIndex: integer; Duration: T
     writeDebug(ME + '.OnPlayerStop called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Duration (TTimeValue) & Item (IPlaylistItem)');
     playerAddress := translatePlayer(PlaylistIndex, PlayerIndex);
     if (playerAddress = -1) then
-      writeError('Error: ' + ME + '.OnPlayerStop called called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
+      writeError('Error: ' + ME + '.OnPlayerStop called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
     else
       setComponent('cueButton', playerAddress, cLEDOn);
     writeDebug(ME + '.OnPlayerStop finished.');
@@ -462,7 +462,7 @@ procedure OnPlayerEOFWarning(PlaylistIndex: integer; PlayerIndex: integer);
     writeDebug(ME + '.OnPlayerEOFWarning called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex));
     playerAddress := translatePlayer(PlaylistIndex, PlayerIndex);
     if (playerAddress = -1) then
-      writeError('Error: ' + ME + '.OnPlayerStart called called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
+      writeError('Error: ' + ME + '.OnPlayerStart called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
     else
       setComponent('sideButton', playerAddress * 2, cLEDBlink);
     writeDebug(ME + '.OnPlayerEOFWarning finished.');
@@ -474,61 +474,60 @@ procedure OnPlayerStateChange(PlaylistIndex: integer; PlayerIndex: integer; OldS
     playerAddress: integer;
   begin
     writeDebug(ME + '.OnPlayerStateChange called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', OldState: ' + StateToStr(OldState) + ', NewState:' + StateToStr(NewState));
+    playerAddress := translatePlayer(PlaylistIndex, PlayerIndex);
     case NewState of
-      psLoaded:
-        begin
-          if (PlaylistIndex = 0) and (PlayerIndex = 0) then
-	    begin
-	      setComponent('cueButton', 1, cLEDOn);
-	      setComponent('sideButton', 1, cLEDOn);
-	      setComponent('sideButton', 2, cLEDOn);
-            end;
-          if (PlaylistIndex = 0) and (PlayerIndex = 1) then
-            begin
-              setComponent('cueButton', 2, cLEDOn);
-              setComponent('sideButton', 3, cLEDOn);
-              setComponent('sideButton', 4, cLEDOn);
-            end;
-        if (PlaylistIndex = 1) and (PlayerIndex = 0) then
-            begin
-              setComponent('cueButton', 3, cLEDOn);
-              setComponent('sideButton', 5, cLEDOn);
-              setComponent('sideButton', 6, cLEDOn);
-            end;
+      psLoaded: case playerAddress of
+        1:
+	  begin
+	    setComponent('cueButton', 1, cLEDOn);
+	    setComponent('sideButton', 1, cLEDOn);
+	    setComponent('sideButton', 2, cLEDOn);
+          end;
+	2:
+          begin
+            setComponent('cueButton', 2, cLEDOn);
+            setComponent('sideButton', 3, cLEDOn);
+            setComponent('sideButton', 4, cLEDOn);
+          end;
+	3:
+          begin
+            setComponent('cueButton', 3, cLEDOn);
+            setComponent('sideButton', 5, cLEDOn);
+            setComponent('sideButton', 6, cLEDOn);
+          end;
+	else writeError('Error: ' + ME + '.OnPlayerStateChange called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
         end;
-      psEmpty:
-        begin
-          if (PlaylistIndex = 0) and (PlayerIndex = 0) then
-	    begin
-	      setComponent('cueButton', 1, cLEDOff);
-	      setComponent('sideButton', 1, cLEDOff);
-	      setComponent('sideButton', 2, cLEDOff);
-            end;
-          if (PlaylistIndex = 0) and (PlayerIndex = 1) then
-            begin
-              setComponent('cueButton', 2, cLEDOff);
-              setComponent('sideButton', 3, cLEDOff);
-              setComponent('sideButton', 4, cLEDOff);
-            end;
-        if (PlaylistIndex = 1) and (PlayerIndex = 0) then
-            begin
-              setComponent('cueButton', 3, cLEDOff);
-              setComponent('sideButton', 5, cLEDOff);
-              setComponent('sideButton', 6, cLEDOff);
-            end;
+      psEmpty: case playerAddress of
+        1:
+	  begin
+	    setComponent('cueButton', 1, cLEDOff);
+	    setComponent('sideButton', 1, cLEDOff);
+	    setComponent('sideButton', 2, cLEDOff);
+          end;
+	2:
+          begin
+            setComponent('cueButton', 2, cLEDOff);
+            setComponent('sideButton', 3, cLEDOff);
+            setComponent('sideButton', 4, cLEDOff);
+          end;
+	3:
+          begin
+            setComponent('cueButton', 3, cLEDOff);
+            setComponent('sideButton', 5, cLEDOff);
+            setComponent('sideButton', 6, cLEDOff);
+          end;
+	else writeError('Error: ' + ME + '.OnPlayerStateChange called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
         end;
       psPlaying:
-        begin
-          if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDBlink);
-          if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDBlink);
-          if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDBlink);
-        end;
+        if (playerAddress = -1) then
+          writeError('Error: ' + ME + '.OnPlayerStateChange called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
+        else
+          setComponent('cueButton', playerAddress, cLEDBlink);
       psPaused:
-        begin
-          if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDOn);
-          if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDOn);
-          if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDOn);
-        end;
+        if (playerAddress = -1) then
+          writeError('Error: ' + ME + '.OnPlayerStateChange called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
+        else
+          setComponent('cueButton', playerAddress, cLEDOn);
     end;
     writeDebug(ME + '.OnPlayerStateChange finished.');
   end;
@@ -539,9 +538,11 @@ procedure OnPlayerPFLOn(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: 
     playerAddress: integer;
   begin
     writeDebug(ME + '.OnPlayerPFLOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
-    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 1, cLEDBlink);
-    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 3, cLEDBlink);
-    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 5, cLEDBlink);
+    playerAddress := translatePlayer(PlaylistIndex, PlayerIndex);
+    if (playerAddress = -1) then
+      writeError('Error: ' + ME + '.OnPlayerPFLOn called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
+    else
+      setComponent('sideButton', ((playerAddress - 1) * 2) + 1, cLEDBlink);
     writeDebug(ME + '.OnPlayerPFLOn finished.');
   end;
 
@@ -551,9 +552,11 @@ procedure OnPlayerPFLOff(PlaylistIndex: integer; PlayerIndex: integer; PFLCount:
     playerAddress: integer;
   begin
     writeDebug(ME + '.OnPlayerPFLOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
-    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 1, cLEDOn);
-    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 3, cLEDOn);
-    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 5, cLEDOn);
+    playerAddress := translatePlayer(PlaylistIndex, PlayerIndex);
+    if (playerAddress = -1) then
+      writeError('Error: ' + ME + '.OnPlayerPFLOff called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
+    else
+      setComponent('sideButton', ((playerAddress - 1) * 2) + 1, cLEDOn);
     writeDebug(ME + '.OnPlayerPFLOff finished.');
   end;
 
