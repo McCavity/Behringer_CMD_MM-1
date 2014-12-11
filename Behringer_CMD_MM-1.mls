@@ -94,9 +94,16 @@ procedure writeDebug(message: String);
     if (DEBUG = true) then
       begin
 	Instance.GetLogger.SystemLog(messageType, message);
-        // systemlog(message);
       end;
-end;
+  end;
+
+procedure writeError(message: String);
+  var
+   messageType:             TLogCategory;
+  begin
+    messageType := lcError;
+    Instance.GetLogger.SystemLog(messageType, message);
+  end;
 
 function StateToStr(iState: TPlayerState): String;
   begin
@@ -356,7 +363,7 @@ procedure OnLoad;
     for i := 0 to Engine.GetPlayBackControl(0).GetPlayerCount - 1 do
       begin
         // check if players are already loaded & set the state in the buttons accordingly
-        if (Engine.GetPlaybackControl(0).GetPlayer(i).GetState = psLoaded) then
+        if (Engine.GetPlaybackControl(0).GetPlayer(i).GetState = psLoaded) or (Engine.GetPlaybackControl(0).GetPlayer(i).GetState = psPaused) then
           begin
             setComponent('cueButton', i + 1, cLEDOn);
             setComponent('sideButton', (2 * i) + 1, cLEDOn);
@@ -408,7 +415,7 @@ function translatePlayer(PlaylistIndex: integer; PlayerIndex: integer): integer;
     Case PlaylistIndex Of
       0: Case PlayerIndex Of
         0: Result := 1;
-	1: Result := 2;
+        1: Result := 2;
       else Result := -1;
       end;
       1: Case PlayerIndex Of
@@ -426,8 +433,8 @@ procedure OnPlayerStart(PlaylistIndex: integer; PlayerIndex: integer; Item: IPla
   begin
     writeDebug(ME + '.OnPlayerStart called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Item (IPlaylistItem)');
     playerAddress := translatePlayer(PlaylistIndex, PlayerIndex);
-    if (playerIndex = -1) then
-      writeDebug('Error: ' + ME + '.OnPlayerStart called called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
+    if (playerAddress = -1) then
+      writeError('Error: ' + ME + '.OnPlayerStart called called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
     else
       setComponent('cueButton', playerAddress, cLEDBlink);
     writeDebug(ME + '.OnPlayerStart finished.');
@@ -435,26 +442,36 @@ procedure OnPlayerStart(PlaylistIndex: integer; PlayerIndex: integer; Item: IPla
 
 // Called when (playlist) player is stopped
 procedure OnPlayerStop(PlaylistIndex: integer; PlayerIndex: integer; Duration: TTimeValue; Item: IPlaylistItem);
+  var
+    playerAddress: integer;
   begin
     writeDebug(ME + '.OnPlayerStop called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Duration (TTimeValue) & Item (IPlaylistItem)');
-    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDOn);
-    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDOn);
-    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDOn);
+    playerAddress := translatePlayer(PlaylistIndex, PlayerIndex);
+    if (playerAddress = -1) then
+      writeError('Error: ' + ME + '.OnPlayerStop called called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
+    else
+      setComponent('cueButton', playerAddress, cLEDOn);
     writeDebug(ME + '.OnPlayerStop finished.');
   end;
 
 // Called when (playlist) player reaches EOF warning point (default: 10s before end)
 procedure OnPlayerEOFWarning(PlaylistIndex: integer; PlayerIndex: integer);
+  var
+    playerAddress: integer;
   begin
     writeDebug(ME + '.OnPlayerEOFWarning called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex));
-    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 2, cLEDBlink);
-    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 4, cLEDBlink);
-    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 6, cLEDBlink);
+    playerAddress := translatePlayer(PlaylistIndex, PlayerIndex);
+    if (playerAddress = -1) then
+      writeError('Error: ' + ME + '.OnPlayerStart called called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
+    else
+      setComponent('sideButton', playerAddress * 2, cLEDBlink);
     writeDebug(ME + '.OnPlayerEOFWarning finished.');
   end;
 
 // Called when (playlist) player changes its state
 procedure OnPlayerStateChange(PlaylistIndex: integer; PlayerIndex: integer; OldState: TPlayerState; NewState: TPlayerState);
+  var
+    playerAddress: integer;
   begin
     writeDebug(ME + '.OnPlayerStateChange called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', OldState: ' + StateToStr(OldState) + ', NewState:' + StateToStr(NewState));
     case NewState of
@@ -518,6 +535,8 @@ procedure OnPlayerStateChange(PlaylistIndex: integer; PlayerIndex: integer; OldS
 
 // Called when (playlist) player enters PFL
 procedure OnPlayerPFLOn(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: integer);
+  var
+    playerAddress: integer;
   begin
     writeDebug(ME + '.OnPlayerPFLOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
     if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 1, cLEDBlink);
@@ -528,6 +547,8 @@ procedure OnPlayerPFLOn(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: 
 
 // Called when (playlist) player leaves PFL
 procedure OnPlayerPFLOff(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: integer);
+  var
+    playerAddress: integer;
   begin
     writeDebug(ME + '.OnPlayerPFLOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
     if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 1, cLEDOn);
