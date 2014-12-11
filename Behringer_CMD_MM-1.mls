@@ -86,6 +86,17 @@ var
 /// Internal script variables (global) ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   VoiceTrack:               boolean;                              // This is 'true' while Voice Track recorder or editor are open, 'false' otherwise
                                                                   // TODO: check if this can be queried from mAirlist (as well as 'Assist' and 'Auto' states)
+procedure writeDebug(message: String);
+  var
+   messageType:             TLogCategory;
+  begin
+    messageType := lcDebug;
+    if (DEBUG = true) then
+      begin
+	Instance.GetLogger.SystemLog(messageType, message);
+        // systemlog(message);
+      end;
+end;
 
 function StateToStr(iState: TPlayerState): String;
   begin
@@ -175,10 +186,7 @@ procedure initController;
     i:                        integer;
 
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.initController called.');
-      end;
+    writeDebug(ME + '.initController called.');
 
     TopEncoders[1]           := 1;
     TopEncoders[2]           := 2;
@@ -236,10 +244,7 @@ procedure initController;
 
     VoiceTrack               := false;
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.initController finished.');
-      end;
+    writeDebug(ME + '.initController finished.');
   end;
 
 procedure testController;
@@ -247,10 +252,7 @@ procedure testController;
     i:                       integer;
 
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.testController called.');
-      end;
+    writeDebug(ME + '.testController called.');
 
     // set the VU meters (basic communication check, if they don´t light then something´s wrong...
     for i:=1 to 2 do
@@ -268,10 +270,7 @@ procedure testController;
       end;
     SetComponent('middleButton', 1, cLEDBlink)
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.testController finished.');
-      end;
+    writeDebug(ME + '.testController finished.');
   end;
 
 procedure resetController;
@@ -279,10 +278,7 @@ procedure resetController;
     i:                        integer;
 
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.resetController called.');
-      end;
+    writeDebug(ME + '.resetController called.');
 
     // reset the VU meters
     for i:=1 to 2 do
@@ -300,81 +296,51 @@ procedure resetController;
       end;
     SetComponent('middleButton', 1, cLEDOff)
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.resetController finished.');
-      end;
+    writeDebug(ME + '.resetController finished.');
   end;
 
 procedure openController;
 
   begin
+    writeDebug(ME + '.openController called.');
+
     if (DEBUG = true) then
       begin
-        systemlog(ME + '.openController called.');
         MidiOutListDevices;                             // List available MIDI Devices
       end;
-
     MidiOutOpen(mAirlistDevice);                        // Open MIDI Device
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.openController finished.');
-      end;
+    writeDebug(ME + '.openController finished.');
   end;
 
 procedure closeController;
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.closeController called.');
-      end;
+    writeDebug(ME + '.closeController called.');
 
     MidiOutClose(mAirlistDevice);                        // Close MIDI Device
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.closeController finished.');
-      end;
+    writeDebug(ME + '.closeController finished.');
   end;
 
 procedure setAssist;
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.SetAssist called.');
-      end;
+    writeDebug(ME + '.SetAssist called.');
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.SetAssist finished.');
-      end;
+    writeDebug(ME + '.SetAssist finished.');
   end;
 
 procedure setAutomation;
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.SetAutomation called.');
-      end;
+    writeDebug(ME + '.SetAutomation called.');
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.SetAutomation finished.');
-      end;
+    writeDebug(ME + '.SetAutomation finished.');
   end;
 
 procedure setVoicetrack;
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.SetVoicetrack called.');
-      end;
+    writeDebug(ME + '.SetVoicetrack called.');
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.SetVoicetrack finished.');
-      end;
+    writeDebug(ME + '.SetVoicetrack finished.');
   end;
 
 procedure OnLoad;
@@ -382,10 +348,7 @@ procedure OnLoad;
     i: integer;
 
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnLoad called.');
-      end;
+    writeDebug(ME + '.OnLoad called.');
 
     initController; 
     openController;
@@ -402,126 +365,78 @@ procedure OnLoad;
       end;
 
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnLoad finished.');
-      end;
+    writeDebug(ME + '.OnLoad finished.');
   end;
 
 procedure OnUnload;
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnUnload called.');
-      end;
+    writeDebug(ME + '.OnUnload called.');
  
     resetController;
     closeController;
  
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnUnload finished.');
-      end;
+    writeDebug(ME + '.OnUnload finished.');
   end;
 
 procedure OnMidiMessage(Device: integer; Status, Data1, Data2: byte);
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnMidiMessage called: Device: ' + IntToStr(Device) + ', Status: ' + IntToStr(Status) + ', Data1: ' + IntToStr(Data1) + ', Data2: ' +IntToStr(Data2));
-      end;
+    writeDebug(ME + '.OnMidiMessage called: Device: ' + IntToStr(Device) + ', Status: ' + IntToStr(Status) + ', Data1: ' + IntToStr(Data1) + ', Data2: ' +IntToStr(Data2));
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnMidiMessage finished.');
-      end;
+    writeDebug(ME + '.OnMidiMessage finished.');
   end;
 
 // Called when automation is enabled
 procedure OnAutomationOn(PlaylistIndex: integer);
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnAutomationOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
-      end;
+    writeDebug(ME + '.OnAutomationOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
 
     setAutomation;
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnAutomationOn finished.');
-      end;
+    writeDebug(ME + '.OnAutomationOn finished.');
   end;
 
 // Called when automation is disabled
 procedure OnAutomationOff(PlaylistIndex: integer);
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnAutomationOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
-      end;
+    writeDebug(ME + '.OnAutomationOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnAutomationOff finished.');
-      end;
+    writeDebug(ME + '.OnAutomationOff finished.');
   end;
 
 // Called when (playlist) player is started
 procedure OnPlayerStart(PlaylistIndex: integer; PlayerIndex: integer; Item: IPlaylistItem);
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerStart called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Item (IPlaylistItem)');
-      end;
+    writeDebug(ME + '.OnPlayerStart called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Item (IPlaylistItem)');
     if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDBlink);
     if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDBlink);
     if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDBlink);
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerStart finished.');
-      end;
+    writeDebug(ME + '.OnPlayerStart finished.');
   end;
 
 // Called when (playlist) player is stopped
 procedure OnPlayerStop(PlaylistIndex: integer; PlayerIndex: integer; Duration: TTimeValue; Item: IPlaylistItem);
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerStop called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Duration (TTimeValue) & Item (IPlaylistItem)');
-      end;
+    writeDebug(ME + '.OnPlayerStop called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Duration (TTimeValue) & Item (IPlaylistItem)');
     if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDOn);
     if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDOn);
     if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDOn);
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerStop finished.');
-      end;
+    writeDebug(ME + '.OnPlayerStop finished.');
   end;
 
 // Called when (playlist) player reaches EOF warning point (default: 10s before end)
 procedure OnPlayerEOFWarning(PlaylistIndex: integer; PlayerIndex: integer);
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerEOFWarning called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex));
-      end;
+    writeDebug(ME + '.OnPlayerEOFWarning called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex));
     if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 2, cLEDBlink);
     if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 4, cLEDBlink);
     if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 6, cLEDBlink);
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerEOFWarning finished.');
-      end;
+    writeDebug(ME + '.OnPlayerEOFWarning finished.');
   end;
 
 // Called when (playlist) player changes its state
 procedure OnPlayerStateChange(PlaylistIndex: integer; PlayerIndex: integer; OldState: TPlayerState; NewState: TPlayerState);
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerStateChange called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', OldState: ' + StateToStr(OldState) + ', NewState:' + StateToStr(NewState));
-      end;
+    writeDebug(ME + '.OnPlayerStateChange called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', OldState: ' + StateToStr(OldState) + ', NewState:' + StateToStr(NewState));
     case NewState of
       psLoaded:
         begin
@@ -578,65 +493,41 @@ procedure OnPlayerStateChange(PlaylistIndex: integer; PlayerIndex: integer; OldS
           if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDOn);
         end;
     end;
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerStateChange finished.');
-      end;
+    writeDebug(ME + '.OnPlayerStateChange finished.');
   end;
 
 // Called when (playlist) player enters PFL
 procedure OnPlayerPFLOn(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: integer);
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerPFLOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
-      end;
+    writeDebug(ME + '.OnPlayerPFLOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
     if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 1, cLEDBlink);
     if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 3, cLEDBlink);
     if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 5, cLEDBlink);
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerPFLOn finished.');
-      end;
+    writeDebug(ME + '.OnPlayerPFLOn finished.');
   end;
 
 // Called when (playlist) player leaves PFL
 procedure OnPlayerPFLOff(PlaylistIndex: integer; PlayerIndex: integer; PFLCount: integer);
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerPFLOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
-      end;
+    writeDebug(ME + '.OnPlayerPFLOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', PFLCount: ' + IntToStr(PFLCount));
     if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('sideButton', 1, cLEDOn);
     if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('sideButton', 3, cLEDOn);
     if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('sideButton', 5, cLEDOn);
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnPlayerPFLOff finished.');
-      end;
+    writeDebug(ME + '.OnPlayerPFLOff finished.');
   end;
 
 // Called when RuntimeData (global variables shared among scripts) change.
 // Set data with SetRuntimData(key, value);
 procedure OnRuntimeDataChange(Key, Value: string);
   begin
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnRuntimeDataChange called. Key: ' + Key + ', Value: ' + Value);
-      end;
+    writeDebug(ME + '.OnRuntimeDataChange called. Key: ' + Key + ', Value: ' + Value);
 
-    if (DEBUG = true) then
-      begin
-        systemlog(ME + '.OnRuntimeDataChange finished.');
-      end;
+    writeDebug(ME + '.OnRuntimeDataChange finished.');
   end;
 
 // Main()
 begin
-  if (DEBUG = true) then
-    begin
-      systemlog(ME + '.Main() called.');
-    end;
+  writeDebug(ME + '.Main() called.');
   initController;
   openController;
   if (DEBUG = true) then
@@ -648,8 +539,5 @@ begin
       resetController;
     end;
   closeController;
-  if (DEBUG = true) then
-    begin
-      systemlog(ME + '.Main() finished.');
-    end;
+  writeDebug(ME + '.Main() finished.');
 end.
