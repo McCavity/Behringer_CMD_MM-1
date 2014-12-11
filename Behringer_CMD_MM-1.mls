@@ -403,13 +403,33 @@ procedure OnAutomationOff(PlaylistIndex: integer);
     writeDebug(ME + '.OnAutomationOff finished.');
   end;
 
+function translatePlayer(PlaylistIndex: integer; PlayerIndex: integer): integer;
+  begin
+    Case PlaylistIndex Of
+      0: Case PlayerIndex Of
+        0: Result := 1;
+	1: Result := 2;
+      else Result := -1;
+      end;
+      1: Case PlayerIndex Of
+        0: Result := 3;
+      else Result := -1;
+      end
+    else   Result := -1;
+    end
+  end;
+
 // Called when (playlist) player is started
 procedure OnPlayerStart(PlaylistIndex: integer; PlayerIndex: integer; Item: IPlaylistItem);
+  var
+    playerAddress: integer;
   begin
     writeDebug(ME + '.OnPlayerStart called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex) + ', TODO: get toStr function for Item (IPlaylistItem)');
-    if (PlaylistIndex = 0) and (PlayerIndex = 0) then setComponent('cueButton', 1, cLEDBlink);
-    if (PlaylistIndex = 0) and (PlayerIndex = 1) then setComponent('cueButton', 2, cLEDBlink);
-    if (PlaylistIndex = 1) and (PlayerIndex = 0) then setComponent('cueButton', 3, cLEDBlink);
+    playerAddress := translatePlayer(PlaylistIndex, PlayerIndex);
+    if (playerIndex = -1) then
+      writeDebug('Error: ' + ME + '.OnPlayerStart called called with bogus Playlist- or PlayerIndex. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex))
+    else
+      setComponent('cueButton', playerAddress, cLEDBlink);
     writeDebug(ME + '.OnPlayerStart finished.');
   end;
 
