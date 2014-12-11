@@ -54,20 +54,20 @@ const
 /// Configurable settings - adapt to your environment /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   DEBUG                     = true;                              // set this to 'false' in production environment - will print *every* MIDI message to system log!
   mAirlistDevice            = 2;                                  // edit your controller´s device number according to mAirlist log  
-  MIDICHANNL                = 4;                                  // beware of MIDI Channel numbering 0..15 (used here) vs. 1..16 (may be used in documentation)
+  MIDICHANNL                = $04;                                // beware of MIDI Channel numbering 0..15 (used here) vs. 1..16 (may be used in documentation)
 
 /// MIDI protocol settings - these should never change ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  MIDINOTOFF                = 128;                                // 0x8n used for buttons. Buttons send 'Note on' on press and 'Note off' on release
-  MIDINOTEON                = 144;                                // 0x9n indicates 'button pressed'
-  MIDICTRLCH                = 176;                                // 0xBn used by encoders and the 'VU Meters'
+  MIDINOTOFF                = $80;                                // 128 used for buttons. Buttons send 'Note on' on press and 'Note off' on release
+  MIDINOTEON                = $90;                                // 144 indicates 'button pressed'
+  MIDICTRLCH                = $B0;                                // 176 used by encoders and the 'VU Meters'
   
 /// BEGIN Behringer CMD MM-1 settings - DON´T touch unless you know what you are doing!!! /////////////////////////////////////////////////////////////////////////////////////////
   MM1BUTTNOFF               = MIDINOTOFF + MIDICHANNL;            // Will be received on button release and sent after a button LED change
   MM1BUTTONON               = MIDINOTEON + MIDICHANNL;            // Will be received on button press and sent to initiate button LED change
   MM1CONTROLR               = MIDICTRLCH + MIDICHANNL;            // Will be received whenever a controller chnages state. Can be sent to set VU
-  cLEDOff                   = 0;                                  // Turn the LEDs amber (can´t turn them off entirely)
-  cLEDOn                    = 1;                                  // Turn the LEDs blue
-  cLEDBlink                 = 2;                                  // Let the LEDs blink blue
+  cLEDOff                   = $00;                                // Turn the LEDs amber (can´t turn them off entirely)
+  cLEDOn                    = $01;                                // Turn the LEDs blue
+  cLEDBlink                 = $02;                                // Let the LEDs blink blue
 
 var 
   TopEncoders:              array[1..4] of integer;
