@@ -45,6 +45,7 @@
 // Version 0.1 - 15.11.2014 - Initial draft, connection to MIDI device, test and reset routines
 //         0.2 - 19.11.2014 - added the skeleton from NotificationScriptTemplate
 //         1.0 - 25.11.2014 - Completed initial functionality
+//         1.1 - 12.12.2014 - Minor bugfixes & code cleanup
 // 
 
 const
