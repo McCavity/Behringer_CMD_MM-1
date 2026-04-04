@@ -1,47 +1,65 @@
-Behringer_CMD_MM-1
-==================
+# Behringer CMD MM-1 for mAirlist
 
-A script to support voice tracking in mAirlist with the Behringer CMD MM-1
-MIDI controller
+> **Archived** — Written in 2014 as a learning project; kept for nostalgic reasons. No active development.
 
-      written by Henning "McCavity" Halfpap
-      inspired by the script "Behringer cmd LC-1" written by Thomas "Kloppi"
-      Kloppholz
-      see: https://github.com/Lexorius/Mairlist-Behringer-Controller/blob/\
-      master/Behringer-CMD-LC-1.txt
+A [mAirlist](https://www.mairlist.com/) notification script (`.mls`) that integrates the **Behringer CMD MM-1** MIDI controller for voice tracking workflows. Button LEDs and VU meters reflect player states in real time.
 
-      Copyright 2014 Henning Halfpap
+Inspired by [Behringer-CMD-LC-1](https://github.com/Lexorius/Mairlist-Behringer-Controller/blob/master/Behringer-CMD-LC-1.txt) by Thomas "Kloppi" Kloppholz.
 
-      Licensed under the Apache License, Version 2.0 (the "License");
-      you may not use this file except in compliance with the License.
-      You may obtain a copy of the License at
+---
 
-          http://www.apache.org/licenses/LICENSE-2.0
+## Requirements
 
-      Unless required by applicable law or agreed to in writing, software
-      distributed under the License is distributed on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-      See the License for the specific language governing permissions and
-      limitations under the License.
+- [mAirlist](https://www.mairlist.com/) broadcast automation software
+- Behringer CMD MM-1 MIDI controller
 
-      Installation instructions:
+---
 
-      1. Place the file „Behringer_CMD_MM-1.mls“ in your mAirlist script
-         folder (e.g. C:\Program Files\mAirlist\scripts)
-      2. Edit the script and set DEBUG to 'true'
-      3. Run the script once from mAirlist. Open mAirlist's System Log and
-         note the device number of your Controller.
-      4. Edit the script again and set mAirlistDevice to the number you just
-         noted.
-      5. Run the script once again from mAirlist. All buttons should start
-         blinking blue & the VU meters should light up approximately 2/3. If
-         this doesn't happen, maybe your devices uses a different MIDI channel.
-         You can either cycle through the edit / run sequence each time
-         modifying the MIDI channel number until you find the correct setting
-         or use Behringer's App (download from Behringer's product page) to
-         determine / set the correct MIDI channel. In any case, edit this
-         script to reflect the correct MIDI channel number.
-      6. Edit the script to set DEBUG to 'false'
-      7. (Optional) Run this script once again with DEBUG set to 'false' if
-         the test mode was on. This resets test mode.
-      8. Set up the scrip as a Notification Script in mAirlist
+## Installation
+
+1. Copy `Behringer_CMD_MM-1.mls` into your mAirlist scripts folder, e.g.:
+   ```
+   C:\Program Files\mAirlist\scripts\
+   ```
+
+2. Open the script and set `DEBUG` to `true`:
+   ```pascal
+   DEBUG = true;
+   ```
+
+3. Run the script once from mAirlist. Open the **System Log** and note the device number of your controller.
+
+4. Set `mAirlistDevice` to that number:
+   ```pascal
+   mAirlistDevice = 2;  // replace with your device number
+   ```
+
+5. Run the script again. All buttons should blink blue and the VU meters should light up to roughly 2/3.
+   - If nothing happens, the MIDI channel may be wrong. Check/adjust `MIDICHANNL` in the script. You can use Behringer's app (available on their product page) to verify the channel.
+
+6. Set `DEBUG` back to `false`:
+   ```pascal
+   DEBUG = false;
+   ```
+
+7. *(Optional)* Run the script once more with `DEBUG = false` to exit test mode and reset the LEDs.
+
+8. Register the script as a **Notification Script** in mAirlist settings.
+
+---
+
+## LED behaviour
+
+| Player state | Cue button | Side buttons |
+|---|---|---|
+| Loaded / Paused | Solid blue | Solid blue |
+| Playing | Blinking blue | — |
+| EOF warning | — | Blinking blue |
+| PFL active | — | Blinking blue |
+| Empty | Amber (off) | Amber (off) |
+
+---
+
+## License
+
+Copyright 2014 Henning Halfpap. Licensed under the [Apache License 2.0](LICENSE.md).
